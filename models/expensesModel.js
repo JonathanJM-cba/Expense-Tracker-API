@@ -10,7 +10,7 @@ const Expenses = sequelize.define(
       autoIncrement: true,
     },
     amount: {
-      type: DataTypes.FLOAT(255),
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     description: {
@@ -18,7 +18,7 @@ const Expenses = sequelize.define(
       allowNull: false,
     },
     date: {
-      type: DataTypes.DATEONLY(),
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     idUser: {

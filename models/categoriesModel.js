@@ -1,8 +1,8 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/configDb");
 
-const Categorys = sequelize.define(
-  "Categorys",
+const Categories = sequelize.define(
+  "Categories",
   {
     id: {
       type: DataTypes.INTEGER(255),
@@ -15,9 +15,9 @@ const Categorys = sequelize.define(
     },
   },
   {
-    tableName: "categorys",
+    tableName: "categories",
     timestamps: true,
   }
 );
 
-module.exports = Categorys;
+module.exports = Categories;
