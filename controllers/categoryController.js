@@ -18,4 +18,14 @@ const createCategory = async (req, res) => {
   }
 };
 
-module.exports = { createCategory };
+const getAllCategories = async (req, res) => {
+  try {
+    const categories = await categoryModel.findAll({});
+    res.status(200).json(categories);
+  } catch (error) {
+    console.log("Error al intentar obtener todas las categorías: ", error);
+    handleHttpError(res, "ERROR_GET_ALL_CATEGORIES", 500);
+  }
+};
+
+module.exports = { createCategory, getAllCategories };
