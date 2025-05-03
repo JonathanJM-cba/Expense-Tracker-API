@@ -1,6 +1,7 @@
 const { userModel } = require("../models");
 const handleHttpError = require("../utils/handleError");
-const { hashPassword } = require("../utils/handlePassword");
+const { hashPassword, verifyPassword } = require("../utils/handlePassword");
+const { generateToken } = require("../utils/handleToken");
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -33,4 +34,32 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser };
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    //Se verifica si existe el usuario
+    const user = await userModel.findOne({
+      where: { email: email },
+    });
+
+    if (!user) return handleHttpError(res, "ERROR_USER_NOT_FOUND", 404);
+
+    //Se verifica la contraseña
+    const checkPassword = await verifyPassword(password, user.password);
+
+    if (!checkPassword)
+      return handleHttpError(res, "ERROR_PASSWORD_INVALID", 400);
+
+    //Caso contrario se genera access token
+    const token = await generateToken(user);
+
+    res
+      .status(200)
+      .json({ message: "Usuario logueado con éxito", token: token });
+  } catch (error) {
+    console.log("Error al intentar loguearse el usuario: ", error);
+    handleHttpError(res, "ERROR_LOGIN_USER", 500);
+  }
+};
+
+module.exports = { createUser, loginUser };
