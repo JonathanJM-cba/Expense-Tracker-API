@@ -3,30 +3,31 @@ const handleHttpError = require("../utils/handleError");
 const { verifyToken } = require("../utils/handleToken");
 
 const checkAuth = async (req, res, next) => {
+  const authorizationHeader = req.headers.authorization;
+  console.log("Valor del encabezado: ", authorizationHeader);
   try {
-    const authorizationHeader = req.headers.authorization;
-
     if (!authorizationHeader || !authorizationHeader.startsWith("Bearer "))
       return handleHttpError(res, "ERROR_NO_TOKEN_HEADER", 400);
 
     //Se obtiene el token
     const token = authorizationHeader.split(" ").pop();
+    console.log("VALOR DEL TOKEN: ", token);
 
     if (!token) return handleHttpError(res, "ERROR_NO_TOKEN_PROVIDED", 400);
 
     //Se verifica la válidez del token
-    const checkToken = await verifyToken(token);
+    const tokenData = await verifyToken(token);
 
-    if (!checkToken) return handleHttpError(res, "ERROR_TOKEN_INVALID", 401);
+    if (!tokenData) return handleHttpError(res, "ERROR_TOKEN_INVALID", 401);
 
-    const user = await userModel.findByPk(token.id);
+    const user = await userModel.findByPk(tokenData.id);
 
     if (!user) return handleHttpError(res, "ERROR_USER_NOT_FOUND", 404);
 
     req.user = {
-      id: token.id,
-      name: token.name,
-      email: token.email,
+      id: user.id,
+      name: user.name,
+      email: user.email,
     };
     next();
   } catch (error) {

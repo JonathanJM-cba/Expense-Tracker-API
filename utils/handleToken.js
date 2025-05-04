@@ -6,7 +6,7 @@ const generateToken = async (user) => {
     {
       id: user.id,
       name: user.name,
-      email: user.name,
+      email: user.email,
     },
     accessTokenKey,
     {
@@ -21,7 +21,11 @@ const generateToken = async (user) => {
  * @returns {Promise} - Retorna una promesa
  */
 const verifyToken = async (token) => {
-  return await jwt.verify(token, accessTokenKey);
+  try {
+    return await jwt.verify(token, accessTokenKey);
+  } catch (error) {
+    console.log("Error al verificar token: ", error);
+  }
 };
 
 module.exports = { generateToken, verifyToken };
