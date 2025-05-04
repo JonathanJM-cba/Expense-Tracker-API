@@ -4,14 +4,12 @@ const { verifyToken } = require("../utils/handleToken");
 
 const checkAuth = async (req, res, next) => {
   const authorizationHeader = req.headers.authorization;
-  console.log("Valor del encabezado: ", authorizationHeader);
   try {
     if (!authorizationHeader || !authorizationHeader.startsWith("Bearer "))
       return handleHttpError(res, "ERROR_NO_TOKEN_HEADER", 400);
 
     //Se obtiene el token
     const token = authorizationHeader.split(" ").pop();
-    console.log("VALOR DEL TOKEN: ", token);
 
     if (!token) return handleHttpError(res, "ERROR_NO_TOKEN_PROVIDED", 400);
 

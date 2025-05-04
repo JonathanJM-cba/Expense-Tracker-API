@@ -4,8 +4,6 @@ const handleHttpError = require("../utils/handleError");
 const createExpense = async (req, res) => {
   const { amount, description, date, idCategory } = req.body;
   const { id, email } = req.user;
-  console.log("Valor del ID: ", id);
-  console.log("Valor del email: ", email);
   try {
     const expenseData = {
       amount: amount,
