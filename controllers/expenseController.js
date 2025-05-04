@@ -1,4 +1,5 @@
 const { expenseModel, categoryModel, userModel } = require("../models");
+const filterStrategies = require("../patterns/filterStrategies");
 const handleHttpError = require("../utils/handleError");
 
 const createExpense = async (req, res) => {
@@ -101,4 +102,44 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-module.exports = { createExpense, updateExpense, deleteExpense };
+const getExpenses = async (req, res) => {
+  const { id } = req.user;
+  const { filter, startDate, endDate } = req.query;
+  try {
+    const whereClause = {
+      idUser: id,
+    };
+
+    if (filter && filterStrategies[filter]) {
+      whereClause.date = filterStrategies[filter](startDate, endDate);
+    } else if (startDate && endDate) {
+      whereClause.date = filterStrategies.custom(startDate, endDate);
+    }
+
+    const expenses = await expenseModel.findAll({
+      where: whereClause,
+    });
+
+    const expensesData = await Promise.all(
+      expenses.map(async (expense) => {
+        const user = await userModel.findByPk(expense.idUser);
+        const category = await categoryModel.findByPk(expense.idCategory);
+
+        return {
+          amount: expense.amount,
+          description: expense.description,
+          date: expense.date,
+          userEmail: user.email,
+          category: category.name,
+        };
+      })
+    );
+
+    res.status(200).json(expensesData);
+  } catch (error) {
+    console.log("Error al intentar obtener los gastos: ", error);
+    handleHttpError(res, "ERROR_GET_EXPENSES", 500);
+  }
+};
+
+module.exports = { createExpense, updateExpense, deleteExpense, getExpenses };
