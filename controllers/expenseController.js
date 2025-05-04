@@ -78,4 +78,27 @@ const updateExpense = async (req, res) => {
   }
 };
 
-module.exports = { createExpense, updateExpense };
+const deleteExpense = async (req, res) => {
+  const { idExpense } = req.params;
+  const { id } = req.user;
+  try {
+    //Se verifica si existe el gasto
+    const expense = await expenseModel.findByPk(idExpense);
+
+    if (!expense) return handleHttpError(res, "ERROR_EXPENSE_NOT_FOUND", 404);
+
+    //Se verifica si el gasto pertenece al usuario correcto
+    if (expense.idUser !== id)
+      return handleHttpError(res, "ERROR_NO_DELETE_PERMISSION", 403);
+
+    //Se elimina el gasto
+    await expense.destroy();
+
+    res.status(200).json({ message: "Gasto eliminado con éxito" });
+  } catch (error) {
+    console.log("Error al intentar eliminar gasto: ", error);
+    handleHttpError(res, "ERROR_DELETE_EXPENSE", 500);
+  }
+};
+
+module.exports = { createExpense, updateExpense, deleteExpense };
